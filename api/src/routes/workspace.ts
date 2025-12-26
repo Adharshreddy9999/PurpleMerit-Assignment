@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticateJWT } from '../middleware/auth';
 import prisma from '../lib/prisma';
+import redis from '../lib/redis';
 
 const router = Router();
 
@@ -35,6 +36,9 @@ router.post('/', authenticateJWT, async (req, res) => {
     const workspace = await prisma.workspace.create({
       data: { name, projectId },
     });
+    // Invalidate cache for this project's workspaces
+    const cacheKey = `workspaces:project:${projectId}`;
+    await redis.del(cacheKey);
     res.status(201).json(workspace);
   } catch (err) {
     res.status(400).json({ error: 'Could not create workspace', details: err });
@@ -67,9 +71,14 @@ router.post('/', authenticateJWT, async (req, res) => {
  *                 $ref: '#/components/schemas/Workspace'
  */
 // Get all workspaces for a project
-router.get('/project/:projectId', authenticateJWT, async (req, res) => {
   const { projectId } = req.params;
+  const cacheKey = `workspaces:project:${projectId}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return res.json(JSON.parse(cached));
+  }
   const workspaces = await prisma.workspace.findMany({ where: { projectId } });
+  await redis.set(cacheKey, JSON.stringify(workspaces), { EX: 60 }); // cache for 60s
   res.json(workspaces);
 });
 
@@ -108,10 +117,16 @@ router.put('/:id', authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
   try {
+    // Get projectId for cache invalidation
+    const workspaceOld = await prisma.workspace.findUnique({ where: { id } });
     const workspace = await prisma.workspace.update({
       where: { id },
       data: { name },
     });
+    if (workspaceOld?.projectId) {
+      const cacheKey = `workspaces:project:${workspaceOld.projectId}`;
+      await redis.del(cacheKey);
+    }
     res.json(workspace);
   } catch (err) {
     res.status(400).json({ error: 'Could not update workspace', details: err });
@@ -143,7 +158,13 @@ router.put('/:id', authenticateJWT, async (req, res) => {
 router.delete('/:id', authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
+    // Get projectId for cache invalidation
+    const workspaceOld = await prisma.workspace.findUnique({ where: { id } });
     await prisma.workspace.delete({ where: { id } });
+    if (workspaceOld?.projectId) {
+      const cacheKey = `workspaces:project:${workspaceOld.projectId}`;
+      await redis.del(cacheKey);
+    }
     res.json({ message: 'Workspace deleted' });
   } catch (err) {
     res.status(400).json({ error: 'Could not delete workspace', details: err });

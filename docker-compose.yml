@@ -9,12 +9,13 @@ services:
       - postgres
       - mongo
       - redis
-  ws:
-    build: ./ws
+  ws-server:
+    build: ./ws-server
     ports:
-      - "4001:4001"
-    env_file:
-      - .env
+      - "5000:5000"
+    environment:
+      - WS_PORT=5000
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - redis
   worker:

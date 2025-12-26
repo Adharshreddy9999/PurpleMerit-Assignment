@@ -10,6 +10,8 @@ import protectedRoutes from './routes/protected';
 import projectRoutes from './routes/project';
 import tokenRoutes from './routes/token';
 import workspaceRoutes from './routes/workspace';
+
+import jobRoutes from './routes/job';
 import { setupSwagger } from './swagger';
 
 
@@ -27,6 +29,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/token', tokenRoutes);
 
 app.use('/api/workspaces', workspaceRoutes);
+app.use('/api/jobs', jobRoutes);
 setupSwagger(app);
 
 app.get('/api/health', (_req, res) => {
