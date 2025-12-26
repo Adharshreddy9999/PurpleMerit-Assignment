@@ -1,11 +1,10 @@
-version: '3.8'
 services:
   api:
     build: ./api
     ports:
       - "4000:4000"
     env_file:
-      - .env
+      - ./api/.env
     depends_on:
       - postgres
       - mongo
@@ -34,7 +33,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: purplemerit
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
   mongo:
@@ -48,7 +47,7 @@ services:
     image: redis:7
     restart: always
     ports:
-      - "6379:6379"
+      - "16379:6379"
 volumes:
   pgdata:
   mongodata:
