@@ -37,6 +37,10 @@ app.get('/api/health', (_req, res) => {
 });
 
 const PORT = process.env.API_PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`API server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`API server running on port ${PORT}`);
+  });
+}
+
+export default app;

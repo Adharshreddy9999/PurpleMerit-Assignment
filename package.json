@@ -1,10 +1,27 @@
 {
   "name": "purplemerit-backend",
   "private": true,
-  "workspaces": ["api", "ws", "worker", "shared"],
+  "workspaces": [
+    "api",
+    "ws",
+    "worker",
+    "shared"
+  ],
   "scripts": {
     "dev:api": "npm --workspace api run dev",
     "dev:ws": "npm --workspace ws run dev",
     "dev:worker": "npm --workspace worker run dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.2.0",
+    "prisma": "^7.2.0",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6"
   }
 }

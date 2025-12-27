@@ -1,7 +1,8 @@
 import { Router } from 'express';
+import { authenticateJWT } from '../middleware/auth';
 import { createClient } from 'redis';
-import { MongoClient } from 'mongodb';
-import { v4 as uuidv4 } from 'uuid';
+import { MongoClient, Collection, Document } from 'mongodb';
+const { v4: uuidv4 } = require('uuid');
 
 const router = Router();
 const REDIS_URL = process.env.REDIS_URL || 'redis://redis:6379';
@@ -10,7 +11,7 @@ const JOB_QUEUE = 'job-queue';
 
 const redis = createClient({ url: REDIS_URL });
 const mongo = new MongoClient(MONGO_URL);
-let jobs;
+let jobs: Collection<Document>;
 
 (async () => {
   await redis.connect();
@@ -19,7 +20,7 @@ let jobs;
 })();
 
 // Submit a new job
-router.post('/', async (req, res) => {
+router.post('/', authenticateJWT, async (req, res) => {
 /**
  * @swagger
  * /api/jobs:
@@ -79,7 +80,7 @@ router.post('/', async (req, res) => {
  *         description: Job not found
  */
 // Get job status/result
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateJWT, async (req, res) => {
   const job = await jobs.findOne({ id: req.params.id });
   if (!job) return res.status(404).json({ error: 'Job not found' });
   res.json(job);

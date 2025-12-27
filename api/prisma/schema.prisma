@@ -53,3 +53,7 @@ model WorkspaceUserRole {
   updatedAt   DateTime  @updatedAt
   @@unique([userId, workspaceId])
 }
+model Test {
+  id String @id @default(uuid())
+  name String
+}

@@ -3,11 +3,13 @@ import { authenticateJWT } from '../middleware/auth';
 import prisma from '../lib/prisma';
 import { requireRole } from '../middleware/roles';
 import redis from '../lib/redis';
+import { validateBody } from '../middleware/validate';
+import { createProjectSchema, updateProjectSchema } from '../validation/schemas';
 
 const router = Router();
 
 // Create a new project
-router.post('/', authenticateJWT, requireRole('admin', 'manager'), async (req, res) => {
+router.post('/', authenticateJWT, requireRole('admin', 'manager'), validateBody(createProjectSchema), async (req, res) => {
 /**
  * @swagger
  * /api/projects:
@@ -47,7 +49,7 @@ router.post('/', authenticateJWT, requireRole('admin', 'manager'), async (req, r
     await redis.del(cacheKey);
     res.status(201).json(project);
   } catch (err) {
-    res.status(400).json({ error: 'Could not create project', details: err });
+      res.status(400).json({ error: 'Could not create project', details: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -84,7 +86,7 @@ router.get('/', authenticateJWT, async (req, res) => {
 });
 
 // Update a project
-router.put('/:id', authenticateJWT, requireRole('admin', 'manager'), async (req, res) => {
+router.put('/:id', authenticateJWT, requireRole('admin', 'manager'), validateBody(updateProjectSchema), async (req, res) => {
 /**
  * @swagger
  * /api/projects/{id}:
@@ -135,7 +137,7 @@ router.put('/:id', authenticateJWT, requireRole('admin', 'manager'), async (req,
     await redis.del(cacheKey);
     res.json(project);
   } catch (err) {
-    res.status(400).json({ error: 'Could not update project', details: err });
+      res.status(400).json({ error: 'Could not update project', details: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -177,7 +179,7 @@ router.delete('/:id', authenticateJWT, requireRole('admin', 'manager'), async (r
     await redis.del(cacheKey);
     res.json({ message: 'Project deleted' });
   } catch (err) {
-    res.status(400).json({ error: 'Could not delete project', details: err });
+      res.status(400).json({ error: 'Could not delete project', details: err instanceof Error ? err.message : String(err) });
   }
 });
 
