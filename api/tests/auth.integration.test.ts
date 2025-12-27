@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../src/index';
+const app = require('../src/index');
 
 describe('Auth & Role-based Access', () => {
   let token: string;
