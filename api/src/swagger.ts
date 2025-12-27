@@ -11,7 +11,7 @@ const options = {
       description: 'API documentation for PurpleMerit backend',
     },
     servers: [
-      { url: 'http://localhost:4000' }
+      { url: '/' }
     ],
     components: {
       schemas: {
