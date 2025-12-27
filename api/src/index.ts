@@ -38,6 +38,11 @@ app.get('/api/health', (_req, res) => {
 });
 
 const PORT = process.env.API_PORT || 4000;
+
+// Add root route for health/info
+app.get('/', (_req, res) => {
+  res.send('PurpleMerit API is running');
+});
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}`);
