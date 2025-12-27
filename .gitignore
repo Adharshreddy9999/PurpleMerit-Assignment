@@ -1,0 +1,37 @@
+# Node
+node_modules/
+dist/
+.env
+.env.*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Docker
+*.pid
+
+# VSCode
+.vscode/
+
+# Coverage
+coverage/
+
+# Database
+pgdata/
+mongodata/
+
+# Others
+.idea/
+*.swp

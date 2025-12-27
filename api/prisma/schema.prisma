@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  projects     Project[] @relation("UserProjects")
+  workspaces   Workspace[] @relation("WorkspaceCollaborators")
+  workspaceRoles WorkspaceUserRole[]
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User     @relation("UserProjects", fields: [ownerId], references: [id])
+  workspaces  Workspace[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+model Workspace {
+  id            String   @id @default(uuid())
+  name          String
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+  collaborators User[]   @relation("WorkspaceCollaborators")
+  roles         WorkspaceUserRole[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model WorkspaceUserRole {
+  id          String   @id @default(uuid())
+  userId      String
+  workspaceId String
+  role        String
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@unique([userId, workspaceId])
+}
+model Test {
+  id String @id @default(uuid())
+  name String
+}
