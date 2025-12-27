@@ -13,11 +13,12 @@ import workspaceRoutes from './routes/workspace';
 
 import jobRoutes from './routes/job';
 import { setupSwagger } from './swagger';
-
+import { auditLogger } from './middleware/auditLogger';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(auditLogger);
 app.use(rateLimit);
 
 app.use('/api/auth', authRoutes);
