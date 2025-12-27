@@ -49,4 +49,5 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-export default app;
+// For Vercel serverless: export the app as default
+module.exports = app;

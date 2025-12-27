@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../src/index';
+const app = require('../src/index');
 // @ts-ignore
 import * as prismaMock from '../__mocks__/@prisma/client';
 
